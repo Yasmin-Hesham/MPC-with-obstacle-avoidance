@@ -1,5 +1,5 @@
-## MPC-with-obstacle-avoidance
-# Description
+# MPC-with-obstacle-avoidance
+## Description
 
 The MPC (Model Predictive Control) implementation uses the Casadi Python Package for numerical optimization and {numpy + matplotlib} for visualization. 
 A holonomic mobile robot (Mecanum wheeled omnnidirectional mobile robot (MWOMR)) is used as a system for the implementation. 
