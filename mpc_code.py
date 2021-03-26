@@ -16,8 +16,8 @@ R4 = 1
 
 step_horizon = 0.1  # time between steps in seconds
 N = 35              # number of look ahead steps
-rob_diam = 0.6      # diameter of the robot
-wheel_radius = 0.35 # wheel radius
+rob_radius = 0.25   # diameter of the robot
+wheel_radius = 0.07 # wheel radius
 Lx = 0.3            # L in J Matrix (half robot x-axis length)
 Ly = 0.3            # l in J Matrix (half robot y-axis length)
 sim_time = 200      # simulation time
@@ -30,14 +30,13 @@ x_target = 20
 y_target = 20
 theta_target = pi/4
 
-v_max = 1
-v_min = -1
+v_max = 500 * (2*pi/60)     #rad/sec
+v_min = -500 * (2*pi/60)    #rad/sec
 
 # adding constraint for collision avoidance
 obstacle_x = 10 # x_dir
 obstacle_y = 10 # y_dir
-obstacle_d = 5 # diameter
-obtacle_parameters = [obstacle_x, obstacle_y, obstacle_d]
+obstacle_r = 2.5 # diameter
 
 def shift_timestep(step_horizon, t0, state_init, u, f):
     f_value = f(state_init, u[:, 0])
@@ -135,7 +134,7 @@ print('g1'+g.dim()+'\n')
 # appending inequality constraints to g
 for k in range(N+1):
     g = ca.vertcat(g, -ca.sqrt( (X[0,k]-obstacle_x)**2 + (X[1,k]-obstacle_y)**2 )
-                   + (rob_diam/2 + obstacle_d/2))
+                   + (rob_radius + obstacle_r))
 
 print('g2'+g.dim()+'\n')
 
@@ -287,4 +286,4 @@ if __name__ == '__main__':
     # simulate
     simulate(cat_states, cat_controls, times, step_horizon, N,
              np.array([x_init, y_init, theta_init, x_target, y_target, theta_target]),
-             np.array([obstacle_x, obstacle_y, obstacle_d/2]), save=False)
+             np.array([obstacle_x, obstacle_y, obstacle_r]), save=True)
