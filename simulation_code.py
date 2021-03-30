@@ -5,7 +5,7 @@ from matplotlib import animation
 from time import time
 
 
-def simulate(cat_states, cat_controls, t, step_horizon, N, reference, obstacle_parameters, save=False):
+def simulate(cat_states, cat_controls, t, step_horizon, N, reference, obstacle_sim, save=False):
     def create_triangle(state=[0,0,0], h=1, w=0.5, update=False):
         x, y, th = state
         triangle = np.array([
@@ -53,20 +53,21 @@ def simulate(cat_states, cat_controls, t, step_horizon, N, reference, obstacle_p
         # xy = target_state.get_xy()
         # target_state.set_xy(xy)            
 
-        return path, horizon, current_state, target_state,
+        return path, horizon, current_state, target_state
 
     # create figure and axes
     fig, ax = plt.subplots(figsize=(10,10))
-    min_scale = min(reference[0], reference[1], reference[3], reference[4]) - 2
-    max_scale = max(reference[0], reference[1], reference[3], reference[4]) + 2
+    min_scale = min(reference[0], reference[1], reference[3], reference[4]) 
+    max_scale = max(reference[0], reference[1], reference[3], reference[4]) + 5
     ax.set_xlim(left = min_scale, right = max_scale)
     ax.set_ylim(bottom = min_scale, top = max_scale)
 
     # create obstacle
-    obstacle_circle = plt.Circle((obstacle_parameters[0], obstacle_parameters[1]), 
-                                 obstacle_parameters[2], fill=False) 
-    ax.set_aspect(1)
-    ax.add_patch(obstacle_circle) 
+    for i in range(len(obstacle_sim)):
+            obstacle_circle = plt.Circle((obstacle_sim[i,0], obstacle_sim[i,1]), 
+                                 obstacle_sim[i,2], fill=False) 
+            ax.set_aspect(1)
+            ax.add_patch(obstacle_circle) 
 
     # create lines:
     #   path

@@ -33,10 +33,22 @@ theta_target = pi/4
 v_max = 500 * (2*pi/60)     #rad/sec
 v_min = -500 * (2*pi/60)    #rad/sec
 
-# adding constraint for collision avoidance
-obstacle_x = 10  # x_dir
-obstacle_y = 10  # y_dir
-obstacle_r = 2.5 # radius
+# adding constraints for collision avoidance
+obstacle_x0 = 10  # x_dir
+obstacle_y0 = 10  # y_dir
+obstacle_r0 = 2.5 # radius
+obstacle_x1 = 15  # x_dir
+obstacle_y1 = 12   # y_dir
+obstacle_r1 = 1.5 # radius
+obstacle_x2 = 15  # x_dir
+obstacle_y2 = 20  # y_dir
+obstacle_r2 = 4 # radius
+n_obstacles = 3
+obstacles = ca.DM([
+    [obstacle_x0, obstacle_y0, obstacle_r0],
+    [obstacle_x1, obstacle_y1, obstacle_r1],
+    [obstacle_x2, obstacle_y2, obstacle_r2]
+])
 
 def shift_timestep(step_horizon, t0, state_init, u, f):
     f_value = f(state_init, u[:, 0])
@@ -129,14 +141,11 @@ for k in range(N):
     st_next_RK4 = st + (step_horizon / 6) * (k1 + 2 * k2 + 2 * k3 + k4)
     g = ca.vertcat(g, st_next - st_next_RK4)
 
-print('g1'+g.dim()+'\n')
-
 # appending inequality constraints to g
 for k in range(N+1):
-    g = ca.vertcat(g, -ca.sqrt( (X[0,k]-obstacle_x)**2 + (X[1,k]-obstacle_y)**2 )
-                   + (rob_radius + obstacle_r))
-
-print('g2'+g.dim()+'\n')
+    for i in range(n_obstacles):
+        g = ca.vertcat(g, -ca.sqrt( (X[0,k]-obstacles[i,0])**2 + (X[1,k]-obstacles[i,1])**2 )
+                   + (rob_radius + obstacles[i,2]))
 
 OPT_variables = ca.vertcat(
     X.reshape((-1, 1)),   # Example: 3x11 ---> 33x1 where 3=states, 11=N+1
@@ -176,20 +185,15 @@ lbx[n_states*(N+1):] = v_min                   # v lower bound for all V
 ubx[n_states*(N+1):] = v_max                   # v upper bound for all V
 
 # boundries
-lbg = ca.DM.zeros((n_states*(N+1)+(N+1), 1))
-ubg = ca.DM.zeros((n_states*(N+1)+(N+1), 1))
+lbg = ca.DM.zeros((n_states*(N+1) + n_obstacles*(N+1), 1))
+ubg = ca.DM.zeros((n_states*(N+1) + n_obstacles*(N+1), 1))
 
 # equality constraints
-lbg[0: n_states*(N+1)] = 0
-ubg[0: n_states*(N+1)] = 0
+lbg[: n_states*(N+1)] = 0
+ubg[: n_states*(N+1)] = 0
 # inequality constraints
-lbg[n_states*(N+1): n_states*(N+1)+(N+1)] = -ca.inf
-ubg[n_states*(N+1): n_states*(N+1)+(N+1)] = 0
-
-print('lbx'+lbx.dim()+'\n')
-print('ubx'+ubx.dim()+'\n')
-print('lbg'+lbg.dim()+'\n')
-print('ubg'+ubg.dim()+'\n')
+lbg[n_states*(N+1):] = -ca.inf
+ubg[n_states*(N+1):] = 0
 
 args = {
     'lbg': lbg,     
@@ -212,6 +216,7 @@ mpc_iter = 0
 cat_states = DM2Arr(X0)
 cat_controls = DM2Arr(u0[:, 0])
 times = np.array([[0]])
+obstacles_sim = DM2Arr(obstacles)
 
 
 ###############################################################################
@@ -258,7 +263,6 @@ if __name__ == '__main__':
 
         t0, state_init, u0 = shift_timestep(step_horizon, t0, state_init, u, f)
 
-        # print(X0)
         X0 = ca.horzcat(
             X0[:, 1:],
             ca.reshape(X0[:, -1], -1, 1)
@@ -286,4 +290,4 @@ if __name__ == '__main__':
     # simulate
     simulate(cat_states, cat_controls, times, step_horizon, N,
              np.array([x_init, y_init, theta_init, x_target, y_target, theta_target]),
-             np.array([obstacle_x, obstacle_y, obstacle_r]), save=True)
+             obstacles_sim, save=False)
