@@ -16,7 +16,7 @@ R4 = 1
 
 step_horizon = 0.1  # time between steps in seconds
 N = 35              # number of look ahead steps
-rob_radius = 0.25   # radius of the robot
+rob_radius = 0.5    # radius of the robot
 wheel_radius = 0.07 # wheel radius
 Lx = 0.3            # L in J Matrix (half robot x-axis length)
 Ly = 0.3            # l in J Matrix (half robot y-axis length)
