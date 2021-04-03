@@ -3,7 +3,7 @@ import casadi as ca
 import numpy as np
 from casadi import sin, cos, pi
 import matplotlib.pyplot as plt
-from simulation_code import simulate
+#from simulation_code import simulate
 
 # setting matrix_weights' variables
 Q_x = 100
@@ -221,73 +221,73 @@ obstacles_sim = DM2Arr(obstacles)
 
 ###############################################################################
 
-if __name__ == '__main__':
-    main_loop = time()  # return time in sec
-    while (ca.norm_2(state_init - state_target) > 1e-1) and (mpc_iter * step_horizon < sim_time):
-        t1 = time()
-        args['p'] = ca.vertcat(
-            state_init,    # current state
-            state_target   # target state
-        )
-        # optimization variable current state
-        args['x0'] = ca.vertcat(
-            ca.reshape(X0, n_states*(N+1), 1),
-            ca.reshape(u0, n_controls*N, 1)
-        )
+# if __name__ == '__main__':
+#     main_loop = time()  # return time in sec
+#     while (ca.norm_2(state_init - state_target) > 1e-1) and (mpc_iter * step_horizon < sim_time):
+#         t1 = time()
+#         args['p'] = ca.vertcat(
+#             state_init,    # current state
+#             state_target   # target state
+#         )
+#         # optimization variable current state
+#         args['x0'] = ca.vertcat(
+#             ca.reshape(X0, n_states*(N+1), 1),
+#             ca.reshape(u0, n_controls*N, 1)
+#         )
 
-        sol = solver(
-            x0=args['x0'],
-            lbx=args['lbx'],
-            ubx=args['ubx'],
-            lbg=args['lbg'],
-            ubg=args['ubg'],
-            p=args['p']
-        )
+#         sol = solver(
+#             x0=args['x0'],
+#             lbx=args['lbx'],
+#             ubx=args['ubx'],
+#             lbg=args['lbg'],
+#             ubg=args['ubg'],
+#             p=args['p']
+#         )
 
-        u = ca.reshape(sol['x'][n_states * (N + 1):], n_controls, N)
-        X0 = ca.reshape(sol['x'][: n_states * (N+1)], n_states, N+1)
+#         u = ca.reshape(sol['x'][n_states * (N + 1):], n_controls, N)
+#         X0 = ca.reshape(sol['x'][: n_states * (N+1)], n_states, N+1)
 
-        cat_states = np.dstack((
-            cat_states,
-            DM2Arr(X0)
-        ))
+#         cat_states = np.dstack((
+#             cat_states,
+#             DM2Arr(X0)
+#         ))
 
-        cat_controls = np.vstack((
-            cat_controls,
-            DM2Arr(u[:, 0])
-        ))
-        t = np.vstack((
-            t,
-            t0
-        ))
+#         cat_controls = np.vstack((
+#             cat_controls,
+#             DM2Arr(u[:, 0])
+#         ))
+#         t = np.vstack((
+#             t,
+#             t0
+#         ))
 
-        t0, state_init, u0 = shift_timestep(step_horizon, t0, state_init, u, f)
+#         t0, state_init, u0 = shift_timestep(step_horizon, t0, state_init, u, f)
 
-        X0 = ca.horzcat(
-            X0[:, 1:],
-            ca.reshape(X0[:, -1], -1, 1)
-        )
+#         X0 = ca.horzcat(
+#             X0[:, 1:],
+#             ca.reshape(X0[:, -1], -1, 1)
+#         )
 
-        # xx ...
-        t2 = time()
-        print(mpc_iter)
-        print(t2-t1)
-        times = np.vstack((
-            times,
-            t2-t1
-        ))
+#         # xx ...
+#         t2 = time()
+#         print(mpc_iter)
+#         print(t2-t1)
+#         times = np.vstack((
+#             times,
+#             t2-t1
+#         ))
 
-        mpc_iter = mpc_iter + 1
+#         mpc_iter = mpc_iter + 1
 
-    main_loop_time = time()
-    ss_error = ca.norm_2(state_init - state_target)
+#     main_loop_time = time()
+#     ss_error = ca.norm_2(state_init - state_target)
 
-    print('\n\n')
-    print('Total time: ', main_loop_time - main_loop)
-    print('avg iteration time: ', np.array(times).mean() * 1000, 'ms')
-    print('final error: ', ss_error)
+#     print('\n\n')
+#     print('Total time: ', main_loop_time - main_loop)
+#     print('avg iteration time: ', np.array(times).mean() * 1000, 'ms')
+#     print('final error: ', ss_error)
 
     # simulate
-    simulate(cat_states, cat_controls, times, step_horizon, N,
-             np.array([x_init, y_init, theta_init, x_target, y_target, theta_target]),
-             obstacles_sim, save=False)
+    # simulate(cat_states, cat_controls, times, step_horizon, N,
+    #         np.array([x_init, y_init, theta_init, x_target, y_target, theta_target]),
+    #         obstacles_sim, save=False)
