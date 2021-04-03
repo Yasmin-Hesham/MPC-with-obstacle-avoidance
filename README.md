@@ -13,7 +13,7 @@ Casadi: https://web.casadi.org/
 ## Content
 1. `mpc_code.py` &rightarrow; The main Python script for MPC
 2. `simulation_code.py` &rightarrow; A helper file implementing the visualization used in MPC code
-3. `main.py`; The code to be run 
+3. `main.py` &rightarrow; The code to be run 
 
 **Note:** 
 - You should run `main.py` 
