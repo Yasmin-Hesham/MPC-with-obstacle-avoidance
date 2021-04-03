@@ -15,7 +15,7 @@ Casadi: https://web.casadi.org/
 2. `simulation_code.py` &rightarrow; A helper file implementing the visualization used in MPC code
 3. `main.py`; The code to be run 
 
-** Note:** 
+**Note:** 
 - You should run `main.py` 
 - Insert the target point as following: [x-direction, y-direction, anangle], example: [10,10,pi]
 
